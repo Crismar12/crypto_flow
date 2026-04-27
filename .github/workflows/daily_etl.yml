@@ -2,9 +2,7 @@ name: Daily Crypto ETL Pipeline
 
 on:
   schedule:
-
     - cron: '0 0 * * *'
-
   workflow_dispatch:
 
 jobs:
@@ -28,12 +26,13 @@ jobs:
       - name: Run ETL Pipeline
         env:
           api_key_token: ${{ secrets.API_KEY_TOKEN }}
+        working-directory: ./crypto_etl_pipeline
         run: python main.py
 
       - name: Commit and push changes
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/crypto_historical.csv
+          git add crypto_etl_pipeline/data/crypto_historical.csv
           git commit -m "auto: update crypto historical data [skip ci]" || echo "No changes to commit"
           git push

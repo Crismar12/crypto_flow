@@ -35,26 +35,26 @@ The pipeline is orchestrated via **GitHub Actions**.
 ## 🚀 How to Run Locally
 
 ### 1. Clone the repository
-
+```bash
 git clone [https://github.com/Crismar12/crypto_flow.git](https://github.com/Crismar12/crypto_flow.git)
 cd crypto_flow
-
+```
 ### 2. Install dependencies
 It is recommended to use a virtual environment to keep your global Python installation clean.
-
+```bash
 cd crypto_etl_pipeline
 pip install -r requirements.txt
-
+```
 ### 3. Configure Environment Variables
 Create a .env file inside the crypto_etl_pipeline directory and add your API key. This ensures your credentials are never exposed in the source code.
-
+```bash
 api_key_token=your_coincap_api_key_here
-
+```
 ### 4. Run the pipeline
 Execute the main orchestrator to start the ETL process.
-
+```bash
 python main.py
-
+```
 ## 📊 Data Output
 The processed data is stored in crypto_etl_pipeline/data/crypto_historical.csv.
 

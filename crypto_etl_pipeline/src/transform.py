@@ -1,41 +1,32 @@
 import pandas as pd
+from datetime import datetime
 
 def transform_crypto_data(raw_data):
     """
-    Recibe el JSON crudo de CoinGecko, lo convierte en un DataFrame de Pandas,
-    filtra las columnas necesarias y limpia los datos.
+    Transforms the raw JSON data from CoinCap into a structured Pandas DataFrame.
+    
+    Args:
+        raw_data (list): A list of dictionaries containing raw crypto data.
+        
+    Returns:
+        pd.DataFrame: A cleaned DataFrame ready for loading, or None if input is empty.
     """
     if not raw_data:
-        print("No hay datos para transformar.")
+        print("Error: No data to transform.")
         return None
-    
-    print("Iniciando transformación de datos con Pandas...")
-    
-    # 1. Convertir el JSON crudo a un DataFrame tabular
+        
+    print("Starting data transformation with Pandas (CoinCap schema)...")
     df = pd.DataFrame(raw_data)
     
-    # 2. Filtrar solo las columnas que aportan valor de negocio
-    columnas_clave = [
-        'id', 'symbol', 'name', 'current_price', 
-        'market_cap', 'total_volume', 'last_updated'
-    ]
-    df_clean = df[columnas_clave]
+    key_columns = ['id', 'symbol', 'name', 'priceUsd', 'marketCapUsd', 'volumeUsd24Hr']
     
-    # 3. Normalizar formatos (Asegurar que la fecha sea un formato de tiempo real)
-    df_clean['last_updated'] = pd.to_datetime(df_clean['last_updated'])
+    df_clean = df[key_columns].copy()
     
-    print(f"Transformación exitosa. Estructura final: {df_clean.shape[0]} filas, {df_clean.shape[1]} columnas.")
+    numeric_columns = ['priceUsd', 'marketCapUsd', 'volumeUsd24Hr']
+    for col in numeric_columns:
+        df_clean[col] = pd.to_numeric(df_clean[col], errors='coerce')
+        
+    df_clean['last_updated'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
-    # Mostramos las primeras 3 líneas de la tabla limpia en la terminal
-    print("\nMuestra de los datos transformados:")
-    print(df_clean.head(3))
-    
+    print(f"Transformation successful. Final structure: {df_clean.shape[0]} rows, {df_clean.shape[1]} columns.")
     return df_clean
-
-if __name__ == "__main__":
-    # Importamos la función de extracción solo para probar este archivo localmente
-    from extract import extract_crypto_data
-    
-    # Simulamos el flujo E -> T
-    datos_crudos = extract_crypto_data()
-    datos_limpios = transform_crypto_data(datos_crudos)

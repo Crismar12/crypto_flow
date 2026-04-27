@@ -1,40 +1,49 @@
 import requests
-import pandas as pd
+import dotenv
+import os
+
+dotenv.load_dotenv()
 
 def extract_crypto_data():
     """
-    Se conecta a la API pública de CoinGecko y extrae el top 10 de criptomonedas.
+    Extracts the top 10 cryptocurrencies from the CoinCap API.
+
+    This function authenticates using a Bearer token (API Key) to ensure
+    higher rate limits and a stable connection suitable for production environments.
+
+    Returns:
+        list: A list of dictionaries containing raw cryptocurrency data.
+        None: If the HTTP request fails or the connection drops.
     """
-    url = "https://api.coingecko.com/api/v3/coins/markets"
+    url = "https://rest.coincap.io/v3/assets"
     
-    # Parámetros exactos de la consulta (Dólares, ordenado por mercado, top 10)
     params = {
-        "vs_currency": "usd",
-        "order": "market_cap_desc",
-        "per_page": 10,
-        "page": 1,
-        "sparkline": False
+        "limit": 10
     }
     
-    print("Iniciando extracción de datos desde CoinGecko...")
+    api_key = os.getenv('api_key_token')
+    if not api_key:
+        print("Critical Error: 'api_key_token' not found in .env file.")
+        return None
+    
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Accept-Encoding": "gzip"
+    }
+    
+    print("Starting data extraction from CoinCap API...")
     
     try:
-        response = requests.get(url, params=params)
-        response.raise_for_status() # Detiene el código si hay error HTTP (ej. 404, 500)
+        response = requests.get(url, params=params, headers=headers, timeout=10)
+        response.raise_for_status() 
         
-        raw_data = response.json()
-        print(f"Éxito. {len(raw_data)} registros extraídos.")
+        raw_data = response.json()["data"]
         
-        # Imprimimos el primer registro (Bitcoin) para validar visualmente la estructura
-        print("\nMuestra del primer registro crudo:")
-        print(raw_data[0])
-        
+        print(f"Success: {len(raw_data)} records extracted securely.")
         return raw_data
         
     except requests.exceptions.RequestException as e:
-        print(f"Fallo crítico en la extracción: {e}")
+        print(f"Critical extraction failure: {e}")
         return None
-
-if __name__ == "__main__":
-    # Prueba de fuego local
-    data = extract_crypto_data()
+    
+    

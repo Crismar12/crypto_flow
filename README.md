@@ -58,6 +58,9 @@ python main.py
 ## 📊 Data Output
 The processed data is stored in crypto_etl_pipeline/data/crypto_historical.csv.
 
+<img width="983" height="122" alt="coingecko_1" src="https://github.com/user-attachments/assets/9d7b7c06-3a6b-4f7c-9171-db06199697be" />
+
+
 ### Each execution appends new records using the following schema:
 
 id: Unique identifier for the asset.
